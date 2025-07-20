@@ -42,6 +42,21 @@
           </select>
         </div>
 
+          <div class="form-group">
+                <label for="attribute_values">Select Attribute Values</label>
+                @foreach($attributeTypes as $type)
+                    <label><strong>{{ $type->name }}</strong></label>
+                    <select name="attribute_values[{{ $type->id }}][]" class="form-control" multiple>
+                        @foreach($type->values as $value)
+                            <option value="{{ $value->id }}"
+                                @if($category->attributeValues->contains($value->id)) selected @endif>
+                                {{ $value->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                @endforeach
+            </div>
+
         <div class="form-group">
           <label for="inputPhoto" class="col-form-label">Photo</label>
           <div class="input-group">

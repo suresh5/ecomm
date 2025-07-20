@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
-
+use App\Models\Attribute;
 class CategoryController extends Controller
 {
     /**
@@ -26,7 +26,8 @@ class CategoryController extends Controller
     public function create()
     {
         $parent_cats = Category::where('is_parent', 1)->orderBy('title', 'ASC')->get();
-        return view('backend.category.create', compact('parent_cats'));
+        $attributeTypes  = Attribute::where('name', 'Type')->get();
+        return view('backend.category.create', compact('parent_cats', 'attributeTypes'));
     }
 
     /**
@@ -44,6 +45,7 @@ class CategoryController extends Controller
             'status' => 'required|in:active,inactive',
             'is_parent' => 'sometimes|in:1',
             'parent_id' => 'nullable|exists:categories,id',
+            'attribute_values' => 'nullable|array',
         ]);
 
         $slug = generateUniqueSlug($request->title, Category::class);
@@ -51,6 +53,11 @@ class CategoryController extends Controller
         $validatedData['is_parent'] = $request->input('is_parent', 0);
 
         $category = Category::create($validatedData);
+
+        if ($request->has('attribute_values')) {
+            $valueIds = collect($request->attribute_values)->flatten()->all(); // [1,2,5,6]
+            $category->attributeValues()->sync($valueIds); // Many-to-many relation
+        }
 
         $message = $category
             ? 'Category successfully added'
@@ -81,9 +88,13 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        $category = Category::findOrFail($id);
+ 
         $parent_cats = Category::where('is_parent', 1)->get();
-        return view('backend.category.edit', compact('category', 'parent_cats'));
+
+ $category = Category::with('attributeValues')->findOrFail($id);
+    $attributeTypes = Attribute::with('values')->where('name', 'Type')->get(); // eager load values
+
+        return view('backend.category.edit', compact('category', 'parent_cats','attributeTypes'));
     }
 
     /**
@@ -109,7 +120,8 @@ class CategoryController extends Controller
         $validatedData['is_parent'] = $request->input('is_parent', 0);
 
         $status = $category->update($validatedData);
-
+        $selectedValues = collect($request->input('attribute_values'))->flatten()->filter()->all();
+    $category->attributeValues()->sync($selectedValues);
         $message = $status
             ? 'Category successfully updated'
             : 'Error occurred, Please try again!';

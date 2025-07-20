@@ -55,6 +55,25 @@
           <span class="text-danger">{{$message}}</span>
           @enderror
         </div>
+
+        @foreach($attributeTypes as $attributeType)
+    <div class="form-group">
+        <label for="attribute_{{ $attributeType->id }}">
+            {{ $attributeType->name }}
+        </label>
+
+        <select name="attribute_values[{{ $attributeType->id }}][]" 
+                id="attribute_{{ $attributeType->id }}" 
+                class="form-control select2" 
+                multiple>
+            @foreach($attributeType->Values as $value)
+                <option value="{{ $value->id }}">
+                    {{ $value->value }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+@endforeach
         
         <div class="form-group">
           <label for="status" class="col-form-label">Status <span class="text-danger">*</span></label>

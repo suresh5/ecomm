@@ -140,6 +140,13 @@
         Route::resource('banner', 'BannerController');
         // Brand
         Route::resource('brand', 'BrandController');
+
+         Route::resource('attribute', 'AttributeController');
+
+          Route::resource('attribute-values', 'AttributeValueController');
+
+
+
         // Profile
         Route::get('/profile', [AdminController::class, 'profile'])->name('admin-profile');
         Route::post('/profile/{id}', [AdminController::class, 'profileUpdate'])->name('profile-update');

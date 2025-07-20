@@ -50,4 +50,14 @@ class Category extends Model
         }
         return 0;
     }
+
+    public function attributes()
+{
+    return $this->belongsToMany(Attribute::class, 'attribute_category');
+}
+
+public function attributeValues()
+{
+    return $this->belongsToMany(AttributeValue::class);
+}
 }

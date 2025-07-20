@@ -46,4 +46,14 @@ class Product extends Model
         return $this->hasOne(Brand::class,'id','brand_id');
     }
 
+    public function variants()
+{
+    return $this->hasMany(ProductVariant::class);
+}
+
+public function specifications()
+{
+    return $this->hasMany(ProductSpecification::class);
+}
+
 }
