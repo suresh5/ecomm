@@ -42,9 +42,12 @@ class Product extends Model
         return $this->hasMany(Wishlist::class)->whereNotNull('cart_id');
     }
 
-    public function brand(){
-        return $this->hasOne(Brand::class,'id','brand_id');
-    }
+    
+
+    public function brands()
+{
+    return $this->belongsToMany(Brand::class, 'brand_product');
+}
 
     public function variants()
 {

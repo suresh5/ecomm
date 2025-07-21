@@ -41,26 +41,51 @@
           </select>
         </div>
 
+<div class="form-group">
+    <label>Select Brands</label>
+    <div class="row">
+        @foreach ($brands as $brand)
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="brand_ids[]"
+                           value="{{ $brand->id }}"
+                           id="brand_{{ $brand->id }}">
+                    <label class="form-check-label" for="brand_{{ $brand->id }}">
+                        {{ $brand->title }}
+                    </label>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+
+
+
+
 <div class="form-check mb-3">
   <input type="checkbox" class="form-check-input" id="hasVariants" name="has_variants" value="1">
   <label class="form-check-label" for="hasVariants">This product has variants</label>
 </div>
 
 <div id="simpleProductFields" class="mb-4">
-  <div class="row">
-    <div class="col-md-3">
-      <label>Price</label>
-      <input type="number" class="form-control" name="simple_price">
+    <div class="col-md-3 mb-3">
+        <label for="price">Price</label>
+        <input type="number" step="0.01" name="price" class="form-control" placeholder="Enter price">
     </div>
-    <div class="col-md-3">
-      <label>Discount</label>
-      <input type="number" class="form-control" name="simple_discount">
+    <div class="col-md-3 mb-3">
+        <label for="discount">Discount (%)</label>
+        <input type="number" step="0.01" name="discount" class="form-control" placeholder="Enter discount">
     </div>
-    <div class="col-md-3">
-      <label>Stock</label>
-      <input type="number" class="form-control" name="simple_stock">
+    <div class="col-md-3 mb-3">
+        <label for="stock">Stock</label>
+        <input type="number" name="stock" class="form-control" placeholder="Enter stock quantity">
     </div>
-  </div>
+    <div class="col-md-3 mb-3">
+        <label for="sku">SKU</label>
+        <input type="text" name="sku" class="form-control" placeholder="Enter SKU">
+    </div>
 </div>
 
 

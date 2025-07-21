@@ -66,12 +66,18 @@ class ProductController extends Controller
             'description'   => $request->description,
             'photo'         => $request->photo,
             'status'        => $request->status ?? 'inactive',
-             
+              'price' => $request->has('has_variants') ? null : ($request->price ?? null),
+        'discount' => $request->has('has_variants') ? null : ($request->discount ?? null),
+        'stock' => $request->has('has_variants') ? null : ($request->stock ?? null),
+        'sku' => $request->has('has_variants') ? null : ($request->sku ?? null),
             'is_featured'   => $request->boolean('is_featured'),
             'cat_id'        => $request->cat_id,
             'child_cat_id'  => $request->child_cat_id,
             'has_variants'  => $request->has('has_variants')? 1: 0,
+            'brand_ids' => 'required|array',
+        'brand_ids.*' => 'exists:brands,id',
         ]);
+         $product->brands()->attach($request->brand_ids);
 
         // 2. Handle product variants (if applicable)
         if ($request->has('has_variants') && is_array($request->brand_variants)) {
@@ -200,6 +206,18 @@ $subcategories = Category::where('is_parent', 0)
         $product->cat_id = $request->cat_id;
         $product->child_cat_id = $request->child_cat_id;
         $product->has_variants = $request->has('has_variants') ? 1 : 0;
+
+           if (!$request->has('has_variants')) {
+        $product->price = $request->price;
+        $product->discount = $request->discount;
+        $product->stock = $request->stock;
+        $product->sku = $request->sku;
+    }else {
+        $product->price = null;
+        $product->discount = null;
+        $product->stock = null;
+        $product->sku = null;
+    }
         $product->save();
 
         // 3. Delete existing variants and their attribute values
@@ -282,6 +300,8 @@ $subcategories = Category::where('is_parent', 0)
         ->whereNotIn('id', $existingSpecIds)
         ->delete();
 
+       $product->brands()->sync($request->brand_ids);
+        
         DB::commit();
         return redirect()->route('product.index')->with('success', 'Product updated successfully.');
 

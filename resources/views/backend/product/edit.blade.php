@@ -39,6 +39,23 @@
             </select>
         </div>
 
+<div class="mb-3">
+            <label for="brands">Select Brands</label>
+            <div class="row">
+                @foreach($brands as $brand)
+                    <div class="col-md-3">
+                        <label>
+                            <input type="checkbox" name="brand_ids[]" value="{{ $brand->id }}"
+                                {{ $product->brands->contains($brand->id) ? 'checked' : '' }}>
+                            {{ $brand->title }}
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+
+
         {{-- Status --}}
         <div class="mb-3">
             <label>Status</label>
@@ -157,13 +174,24 @@
 
         {{-- Non-variant input --}}
         <div id="nonVariantFields" class="{{ $product->has_variants ? 'd-none' : '' }}">
-            <div class="mb-2">
+            <div class="mb-3">
                 <label>Price</label>
-                <input type="number" name="price" class="form-control" value="{{ $product->price }}">
+                <input type="text" name="price" value="{{ $product->price }}" class="form-control">
             </div>
-            <div class="mb-2">
+
+            <div class="mb-3">
+                <label>Discount</label>
+                <input type="text" name="discount" value="{{ $product->discount }}" class="form-control">
+            </div>
+
+            <div class="mb-3">
                 <label>Stock</label>
-                <input type="number" name="stock" class="form-control" value="{{ $product->stock }}">
+                <input type="number" name="stock" value="{{ $product->stock }}" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>SKU</label>
+                <input type="text" name="sku" value="{{ $product->sku }}" class="form-control">
             </div>
         </div>
 
