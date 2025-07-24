@@ -15,6 +15,7 @@
     use App\Http\Controllers\CouponController;
     use App\Http\Controllers\PayPalController;
     use App\Http\Controllers\NotificationController;
+    use App\Http\Controllers\AssetUploadController;
     use App\Http\Controllers\HomeController;
     use \UniSharp\LaravelFilemanager\Lfm;
     use App\Http\Controllers\Auth\ResetPasswordController;
@@ -145,7 +146,10 @@
 
           Route::resource('attribute-values', 'AttributeValueController');
 
-
+    Route::get('uploads', [AssetUploadController::class, 'index'])->name('upload.index');
+    Route::get('uploads/create', [AssetUploadController::class, 'create'])->name('upload.create');
+    Route::post('uploads/store', [AssetUploadController::class, 'store'])->name('upload.store');
+    Route::delete('uploads/{id}', [AssetUploadController::class, 'destroy'])->name('upload.destroy');
 
         // Profile
         Route::get('/profile', [AdminController::class, 'profile'])->name('admin-profile');

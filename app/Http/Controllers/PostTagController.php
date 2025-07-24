@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\PostTag;
+use App\Models\Tag;
 use Illuminate\Support\Str;
 class PostTagController extends Controller
 {
@@ -14,7 +14,7 @@ class PostTagController extends Controller
      */
     public function index()
     {
-        $postTag=PostTag::orderBy('id','DESC')->paginate(10);
+        $postTag=Tag::orderBy('id','DESC')->paginate(10);
         return view('backend.posttag.index')->with('postTags',$postTag);
     }
 
@@ -42,12 +42,12 @@ class PostTagController extends Controller
         ]);
         $data=$request->all();
         $slug=Str::slug($request->title);
-        $count=PostTag::where('slug',$slug)->count();
+        $count=Tag::where('slug',$slug)->count();
         if($count>0){
             $slug=$slug.'-'.date('ymdis').'-'.rand(0,999);
         }
         $data['slug']=$slug;
-        $status=PostTag::create($data);
+        $status=Tag::create($data);
         if($status){
             request()->session()->flash('success','Post Tag Successfully added');
         }
@@ -76,7 +76,7 @@ class PostTagController extends Controller
      */
     public function edit($id)
     {
-        $postTag=PostTag::findOrFail($id);
+        $postTag=Tag::findOrFail($id);
         return view('backend.posttag.edit')->with('postTag',$postTag);
     }
 
@@ -89,7 +89,7 @@ class PostTagController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $postTag=PostTag::findOrFail($id);
+        $postTag=Tag::findOrFail($id);
          // return $request->all();
          $this->validate($request,[
             'title'=>'string|required',

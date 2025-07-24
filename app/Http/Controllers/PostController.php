@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Post;
-use App\Models\PostCategory;
-use App\Models\PostTag;
+use App\Models\Category;
+use App\Models\Tag;
 use App\User;
 
 class PostController extends Controller
@@ -30,8 +30,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        $categories=PostCategory::get();
-        $tags=PostTag::get();
+        $categories=Category::get();
+        $tags=Tag::get();
         $users=User::get();
         return view('backend.post.create')->with('users',$users)->with('categories',$categories)->with('tags',$tags);
     }
@@ -106,7 +106,7 @@ class PostController extends Controller
     {
         $post=Post::findOrFail($id);
         $categories=PostCategory::get();
-        $tags=PostTag::get();
+        $tags=Tag::get();
         $users=User::get();
         return view('backend.post.edit')->with('categories',$categories)->with('users',$users)->with('tags',$tags)->with('post',$post);
     }

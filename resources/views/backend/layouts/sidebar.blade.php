@@ -131,6 +131,21 @@
         </div>
     </li>
 
+    {{-- Asset --}}
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#assetCollapse" aria-expanded="true" aria-controls="assetCollapse">
+          <i class="fas fa-cubes"></i>
+          <span>Asset Manager</span>
+        </a>
+        <div id="assetCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Asset Options:</h6>
+            <a class="collapse-item" href="{{route('upload.index')}}">Manage</a>
+            <a class="collapse-item" href="{{route('upload.create')}}">Add Asset</a>
+          </div>
+        </div>
+    </li>
+
   
     {{-- Shipping --}}
     <!-- <li class="nav-item">
@@ -172,7 +187,7 @@
     </div> -->
 
     <!-- Posts -->
-    <!-- <li class="nav-item">
+    <li class="nav-item">
       <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#postCollapse" aria-expanded="true" aria-controls="postCollapse">
         <i class="fas fa-fw fa-folder"></i>
         <span>Posts</span>
@@ -184,7 +199,7 @@
           <a class="collapse-item" href="{{route('post.create')}}">Add Post</a>
         </div>
       </div>
-    </li> -->
+    </li>
 
      <!-- Category -->
      <!-- <li class="nav-item">
@@ -202,7 +217,7 @@
       </li> -->
 
       <!-- Tags -->
-    <!-- <li class="nav-item">
+    <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#tagCollapse" aria-expanded="true" aria-controls="tagCollapse">
             <i class="fas fa-tags fa-folder"></i>
             <span>Tags</span>
@@ -214,7 +229,7 @@
             <a class="collapse-item" href="{{route('post-tag.create')}}">Add Tag</a>
             </div>
         </div>
-    </li> -->
+    </li>
 
       <!-- Comments -->
       <!-- <li class="nav-item">
