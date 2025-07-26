@@ -16,6 +16,23 @@
           @enderror
         </div>
 
+        <div class="form-group form-check">
+    <input type="checkbox" name="ishomepage" class="form-check-input" id="ishomepage" value="1" {{ old('ishomepage', $category->ishomepage ?? false) ? 'checked' : '' }}>
+    <label class="form-check-label" for="ishomepage">Show on Homepage</label>
+</div>
+
+<div class="form-group">
+    <label for="engname">slug</label>
+    <input type="text" name="engname" class="form-control" value="{{ old('slug', $category->slug ?? '') }}">
+</div>
+
+<div class="form-group">
+    <label for="position">Display Position</label>
+    <select name="position" class="form-control" required>
+        <option value="center" {{ old('position', $category->position ?? '') == 'center' ? 'selected' : '' }}>Center</option>
+        <option value="side" {{ old('position', $category->position ?? '') == 'side' ? 'selected' : '' }}>Side</option>
+    </select>
+</div>
         <div class="form-group">
           <label for="summary" class="col-form-label">Summary</label>
           <textarea class="form-control" id="summary" name="summary">{{$category->summary}}</textarea>
@@ -42,6 +59,14 @@
           </select>
         </div>
 
+
+        <div class="form-group">
+    <label for="position">Display Position</label>
+    <select name="position" class="form-control" required>
+        <option value="center" {{ old('position', $category->position ?? '') == 'center' ? 'selected' : '' }}>Center</option>
+        <option value="side" {{ old('position', $category->position ?? '') == 'side' ? 'selected' : '' }}>Side</option>
+    </select>
+</div>
           <div class="form-group">
                 <label for="attribute_values">Select Attribute Values</label>
                 @foreach($attributeTypes as $type)

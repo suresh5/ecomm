@@ -20,6 +20,8 @@
             <tr>
               <th>S.N.</th>
               <th>Title</th>
+              <th>English Name</th>
+<th>Homepage?</th>
               <th>Slug</th>
               <th>Is Parent</th>
               <th>Parent Category</th>
@@ -32,6 +34,8 @@
             <tr>
               <th>S.N.</th>
               <th>Title</th>
+              <th>English Name</th>
+<th>Homepage?</th>
               <th>Slug</th>
               <th>Is Parent</th>
               <th>Parent Category</th>
@@ -48,6 +52,8 @@
                 <tr>
                     <td>{{$category->id}}</td>
                     <td>{{$category->title}}</td>
+                    <td>{{ $category->engname }}</td>
+<td>{{ $category->ishomepage ? 'Yes' : 'No' }}</td>
                     <td>{{$category->slug}}</td>
                     <td>{{(($category->is_parent==1)? 'Yes': 'No')}}</td>
                     <td>

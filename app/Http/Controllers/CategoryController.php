@@ -46,11 +46,16 @@ class CategoryController extends Controller
             'is_parent' => 'sometimes|in:1',
             'parent_id' => 'nullable|exists:categories,id',
             'attribute_values' => 'nullable|array',
+            'engname' => 'required|string|unique:categories,engname',
+            'slug' => 'required|string|unique:categories,slug',
+            'ishomepage' => 'nullable|boolean',
+            'position' => 'required|in:center,side',
         ]);
 
-        $slug = generateUniqueSlug($request->title, Category::class);
-        $validatedData['slug'] = $slug;
+        // $slug = generateUniqueSlug($request->engname, Category::class);
+        // $validatedData['slug'] = $slug;
         $validatedData['is_parent'] = $request->input('is_parent', 0);
+        $validatedData['ishomepage'] = $request->has('ishomepage') ? 1 : 0;
 
         $category = Category::create($validatedData);
 
@@ -115,9 +120,15 @@ class CategoryController extends Controller
             'status' => 'required|in:active,inactive',
             'is_parent' => 'sometimes|in:1',
             'parent_id' => 'nullable|exists:categories,id',
+            'engname' => 'required|string|max:255|unique:categories,engname,' . $category->id,
+            'slug' => 'required|string|max:255|unique:categories,slug,' . $category->id,
+             'ishomepage' => 'nullable|boolean',
+             'position' => 'required|in:center,side',
         ]);
-
+// $slug = generateUniqueSlug($request->engname, Category::class);
+//         $validatedData['slug'] = $slug;
         $validatedData['is_parent'] = $request->input('is_parent', 0);
+        $validatedData['ishomepage'] = $request->input('ishomepage', 0);
 
         $status = $category->update($validatedData);
         $selectedValues = collect($request->input('attribute_values'))->flatten()->filter()->all();

@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    protected $fillable=['title','slug','summary','photo','status','is_parent','parent_id','added_by'];
+    protected $fillable=['title','slug','summary','photo','status','is_parent','parent_id','added_by', 'engname',       // ✅ add this
+    'ishomepage','position'];
 
     public function parent_info(){
         return $this->hasOne('App\Models\Category','id','parent_id');
@@ -60,4 +61,31 @@ public function attributeValues()
 {
     return $this->belongsToMany(AttributeValue::class);
 }
+
+public function posts()
+{
+    return $this->hasMany(\App\Models\Post::class, 'category_id')
+        ->where('content_type', 'post');
+}
+
+public function videos()
+{
+    return $this->hasMany(\App\Models\Post::class, 'category_id')
+        ->where('content_type', 'video');
+}
+
+public function shorts()
+{
+    return $this->hasMany(\App\Models\Post::class, 'category_id')
+        ->where('content_type', 'short');
+}
+public function children()
+{
+    return $this->hasMany(Category::class, 'parent_id');
+}
+public function allDescendantIds()
+{
+    return $this->children()->pluck('id')->merge([$this->id]);
+}
+
 }
