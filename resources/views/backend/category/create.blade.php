@@ -15,13 +15,6 @@
           @enderror
         </div>
 
-        <div class="form-group">
-          <label for="summary" class="col-form-label">Summary</label>
-          <textarea class="form-control" id="summary" name="summary">{{old('summary')}}</textarea>
-          @error('summary')
-          <span class="text-danger">{{$message}}</span>
-          @enderror
-        </div>
 
         <div class="form-group">
           <label for="is_parent">Is Parent</label><br>
@@ -38,17 +31,32 @@
               @endforeach
           </select>
         </div>
-<div class="form-group">
+          <div class="row">
+<div class="form-group col-md-6">
     <label for="engname">English Name</label>
     <input type="text" name="engname" class="form-control" value="{{ old('engname', $category->engname ?? '') }}">
 </div>
 
-<div class="form-group">
+<div class="form-group col-md-6">
     <label for="engname">slug</label>
     <input type="text" name="engname" class="form-control" value="{{ old('slug', $category->slug ?? '') }}">
 </div>
+</div>
+ <div class="row">
+<div class="form-group col-md-6">
+    <label for="menu_position">Menu Position</label>
+    <select name="menu_position" class="form-control" required>
+        <option value="">-- Select Position --</option>
+        <option value="main" {{ old('menu_position', $category->menu_position ?? '') === 'main' ? 'selected' : '' }}>Main</option>
+        <option value="extra" {{ old('menu_position', $category->menu_position ?? '') === 'extra' ? 'selected' : '' }}>Extra</option>
+       </select>
+</div>
 
-
+<div class="form-group col-md-6">
+    <label for="sort_order">Sort Order</label>
+    <input type="number" name="sort_order" class="form-control" value="{{ old('sort_order', $category->sort_order ?? 0) }}">
+</div>
+</div>
 
 
 <div class="form-group form-check">
@@ -99,6 +107,13 @@
     </div>
 @endforeach
         
+        <div class="form-group">
+          <label for="summary" class="col-form-label">Summary</label>
+          <textarea class="form-control" id="summary" name="summary">{{old('summary')}}</textarea>
+          @error('summary')
+          <span class="text-danger">{{$message}}</span>
+          @enderror
+        </div>
         <div class="form-group">
           <label for="status" class="col-form-label">Status <span class="text-danger">*</span></label>
           <select name="status" class="form-control">

@@ -12,14 +12,43 @@ class CategoryApiController extends Controller
     // 1. List all categories with their subcategories
     public function index()
     {
-        $categories = Category::where('is_parent', 1)
+        // $categories = Category::where('is_parent', 1)
+        //     ->where('status', 'active')
+        //     ->with(['children' => function ($q) {
+        //         $q->where('status', 'active');
+        //     }])
+        //     ->get();
+
+        // return CategoryResource::collection($categories);
+
+            $categories = Category::where('is_parent', 1)
             ->where('status', 'active')
             ->with(['children' => function ($q) {
-                $q->where('status', 'active');
+            $q->where('status', 'active')->orderBy('sort_order');
             }])
+            ->orderBy('sort_order')
             ->get();
 
-        return CategoryResource::collection($categories);
+            $grouped = [];
+
+            foreach ($categories as $category) {
+            $positions = explode(',', $category->menu_position);
+
+            foreach ($positions as $position) {
+            $position = trim($position);
+
+            if (!isset($grouped[$position])) {
+            $grouped[$position] = [];
+            }
+
+            $grouped[$position][] = new CategoryResource($category);
+            }
+            }
+
+            return response()->json([
+            'status' => true,
+            'data' => $grouped
+            ]);
     }
 
     // 2. List only subcategories of a given parent category

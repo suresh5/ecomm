@@ -50,6 +50,8 @@ class CategoryController extends Controller
             'slug' => 'required|string|unique:categories,slug',
             'ishomepage' => 'nullable|boolean',
             'position' => 'required|in:center,side',
+             'sort_order' => 'nullable|integer|min:0',
+              'menu_position' => 'nullable|in:main,extra,home',
         ]);
 
         // $slug = generateUniqueSlug($request->engname, Category::class);
@@ -124,6 +126,8 @@ class CategoryController extends Controller
             'slug' => 'required|string|max:255|unique:categories,slug,' . $category->id,
              'ishomepage' => 'nullable|boolean',
              'position' => 'required|in:center,side',
+             'sort_order' => 'nullable|integer|min:0',
+              'menu_position' => 'nullable|in:main,extra,home',
         ]);
 // $slug = generateUniqueSlug($request->engname, Category::class);
 //         $validatedData['slug'] = $slug;

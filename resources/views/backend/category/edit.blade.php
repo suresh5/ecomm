@@ -27,6 +27,20 @@
 </div>
 
 <div class="form-group">
+    <label for="menu_position">Menu Position</label>
+    <select name="menu_position" class="form-control" required>
+        <option value="">-- Select Position --</option>
+        <option value="main" {{ old('menu_position', $category->menu_position ?? '') === 'main' ? 'selected' : '' }}>Main</option>
+        <option value="extra" {{ old('menu_position', $category->menu_position ?? '') === 'extra' ? 'selected' : '' }}>Extra</option>
+       </select>
+</div>
+
+<div class="form-group">
+    <label for="sort_order">Sort Order</label>
+    <input type="number" name="sort_order" class="form-control" value="{{ old('sort_order', $category->sort_order ?? 0) }}">
+</div>
+
+<div class="form-group">
     <label for="position">Display Position</label>
     <select name="position" class="form-control" required>
         <option value="center" {{ old('position', $category->position ?? '') == 'center' ? 'selected' : '' }}>Center</option>
