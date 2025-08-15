@@ -37,8 +37,7 @@ class ProductController extends Controller
         $brands = Brand::get();
 
         $brands = Brand::where('status', 'active')->get();
-    $attributes = Attribute::with('values')->get(); // eager load attribute values
-
+        $attributes = Attribute::with('values')->get(); // eager load attribute values
 
         $categories = Category::where('is_parent', 1)->get();
         return view('backend.product.create', compact('categories', 'brands', 'attributes'));
@@ -50,117 +49,117 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
- public function store(Request $request)
-{
-    //echo "coming";exit;
-    DB::beginTransaction();
- echo "<pre>";
+    public function store(Request $request)
+    {
+        //echo "coming";exit;
+        DB::beginTransaction();
+        echo '<pre>';
 
- //print_r($request->spec_groups);exit;
-    try {
-        // 1. Create the main product
-        $product = Product::create([
-            'title'         => $request->title,
-            'slug'          => Str::slug($request->title),
-            'summary'       => $request->summary,
-            'description'   => $request->description,
-            'photo'         => $request->photo,
-            'status'        => $request->status ?? 'inactive',
-              'price' => $request->has('has_variants') ? null : ($request->price ?? null),
-        'discount' => $request->has('has_variants') ? null : ($request->discount ?? null),
-        'stock' => $request->has('has_variants') ? null : ($request->stock ?? null),
-        'sku' => $request->has('has_variants') ? null : ($request->sku ?? null),
-            'is_featured'   => $request->boolean('is_featured'),
-            'cat_id'        => $request->cat_id,
-            'child_cat_id'  => $request->child_cat_id,
-            'has_variants'  => $request->has('has_variants')? 1: 0,
-            'brand_ids' => 'required|array',
-        'brand_ids.*' => 'exists:brands,id',
-        ]);
-         $product->brands()->attach($request->brand_ids);
+        //print_r($request->spec_groups);exit;
+        try {
+            // 1. Create the main product
+            $product = Product::create([
+                'title' => $request->title,
+                'slug' => Str::slug($request->title),
+                'summary' => $request->summary,
+                'description' => $request->description,
+                'photo' => $request->photo,
+                'status' => $request->status ?? 'inactive',
+                'price' => $request->has('has_variants') ? null : $request->price ?? null,
+                'discount' => $request->has('has_variants') ? null : $request->discount ?? null,
+                'stock' => $request->has('has_variants') ? null : $request->stock ?? null,
+                'sku' => $request->has('has_variants') ? null : $request->sku ?? null,
+                'is_featured' => $request->boolean('is_featured'),
+                'cat_id' => $request->cat_id,
+                'child_cat_id' => $request->child_cat_id,
+                'has_variants' => $request->has('has_variants') ? 1 : 0,
+                'brand_ids' => 'required|array',
+                'brand_ids.*' => 'exists:brands,id',
+            ]);
+            $product->brands()->attach($request->brand_ids);
 
-        // 2. Handle product variants (if applicable)
-        if ($request->has('has_variants') && is_array($request->brand_variants)) {
-            foreach ($request->brand_variants as $variant) {
-                //echo $variant['brand_id'];exit;
-                $pv = ProductVariant::create([
-                    'product_id'     => $product->id,
-                    'sku'            => $variant['sku'] ?? null,
-                    'price'          => $variant['price'],
-                    'discount'       => $variant['discount'] ?? null,
-                    'stock'          => $variant['stock'] ?? 0,
-                    'brand_id'       => $variant['brand_id'],
-                    'variant_photo'  => $variant['variant_photo'] ?? null,
-                ]);
+            // 2. Handle product variants (if applicable)
+            if ($request->has('has_variants') && is_array($request->brand_variants)) {
+                foreach ($request->brand_variants as $variant) {
+                    //echo $variant['brand_id'];exit;
+                    $pv = ProductVariant::create([
+                        'product_id' => $product->id,
+                        'sku' => $variant['sku'] ?? null,
+                        'price' => $variant['price'],
+                        'discount' => $variant['discount'] ?? null,
+                        'stock' => $variant['stock'] ?? 0,
+                        'brand_id' => $variant['brand_id'],
+                        'variant_photo' => $variant['variant_photo'] ?? null,
+                    ]);
 
-                // Save attribute-value combinations
-                if (!empty($variant['attributes']) && is_array($variant['attributes'])) {
-                    foreach ($variant['attributes'] as $attr) {
-                        DB::table('product_variant_values')->insert([
-                            'product_variant_id' => $pv->id,
-                            'attribute_id'       => $attr['attribute_id'],
-                            'attribute_value_id' => $attr['value_id'],
-                            'created_at'         => now(),
-                            'updated_at'         => now(),
-                        ]);
+                    // Save attribute-value combinations
+                    if (!empty($variant['attributes']) && is_array($variant['attributes'])) {
+                        foreach ($variant['attributes'] as $attr) {
+                            DB::table('product_variant_values')->insert([
+                                'product_variant_id' => $pv->id,
+                                'attribute_id' => $attr['attribute_id'],
+                                'attribute_value_id' => $attr['value_id'],
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                        }
+                    }
+
+                    // Save variant-level specifications (if any)
+                    if (!empty($variant['specifications']) && is_array($variant['specifications'])) {
+                        foreach ($variant['specifications'] as $spec) {
+                            if (!empty($spec['name'])) {
+                                VariantSpecification::create([
+                                    'product_variant_id' => $pv->id,
+                                    'spec_name' => $spec['name'],
+                                    'spec_value' => $spec['value'] ?? '',
+                                ]);
+                            }
+                        }
                     }
                 }
+            }
 
-                // Save variant-level specifications (if any)
-                if (!empty($variant['specifications']) && is_array($variant['specifications'])) {
-                    foreach ($variant['specifications'] as $spec) {
-                        if (!empty($spec['name'])) {
-                            VariantSpecification::create([
-                                'product_variant_id' => $pv->id,
-                                'spec_name'               => $spec['name'],
-                                'spec_value'              => $spec['value'] ?? '',
+            // 3. Save general specifications (for simple products)
+            // if (is_array($request->specifications)) {
+            //     foreach ($request->specifications as $spec) {
+            //         if (!empty($spec['name'])) {
+            //             ProductSpecification::create([
+            //                 'product_id' => $product->id,
+            //                 'name'       => $spec['name'],
+            //                 'value'      => $spec['value'] ?? '',
+            //             ]);
+            //         }
+            //     }
+            // }
+
+            if ($request->has('spec_groups')) {
+                foreach ($request->spec_groups as $groupData) {
+                    $labelName = $groupData['label'];
+                    // Save specifications under the group
+                    if (!empty($groupData['specifications'])) {
+                        foreach ($groupData['specifications'] as $spec) {
+                            ProductSpecification::create([
+                                'product_id' => $product->id,
+                                'label' => $labelName,
+                                'name' => $spec['name'],
+                                'value' => $spec['value'],
                             ]);
                         }
                     }
                 }
             }
+
+            DB::commit();
+            return redirect()->route('product.index')->with('success', 'Product created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            //echo $e->getMessage();exit;
+            return back()
+                ->with('error', 'Failed to create product: ' . $e->getMessage())
+                ->withInput();
         }
-
-        // 3. Save general specifications (for simple products)
-        // if (is_array($request->specifications)) {
-        //     foreach ($request->specifications as $spec) {
-        //         if (!empty($spec['name'])) {
-        //             ProductSpecification::create([
-        //                 'product_id' => $product->id,
-        //                 'name'       => $spec['name'],
-        //                 'value'      => $spec['value'] ?? '',
-        //             ]);
-        //         }
-        //     }
-        // }
-
-       if ($request->has('spec_groups')) {
-            foreach ($request->spec_groups as $groupData) {
-                 
-                $labelName =  $groupData['label'];
-                // Save specifications under the group
-                if (!empty($groupData['specifications'])) {
-                    foreach ($groupData['specifications'] as $spec) {
-                        ProductSpecification::create([
-                            'product_id' => $product->id,
-                            'label' => $labelName,
-                            'name' => $spec['name'],
-                            'value' => $spec['value']
-                        ]);
-                    }
-                }
-            }
-        }
-
-        DB::commit();
-        return redirect()->route('product.index')->with('success', 'Product created successfully.');
-        
-    } catch (\Exception $e) {
-        DB::rollBack();
-        //echo $e->getMessage();exit;
-        return back()->with('error', 'Failed to create product: ' . $e->getMessage())->withInput();
     }
-}
 
     /**
      * Display the specified resource.
@@ -183,23 +182,17 @@ class ProductController extends Controller
     {
         $brands = Brand::get();
         $product = Product::findOrFail($id);
-         $prospecifications = ProductSpecification::where('product_id', $id)
-        ->orderBy('label')
-        ->orderBy('name')
-        ->get()
-        ->groupBy('label'); // group by label column
+        $prospecifications = ProductSpecification::where('product_id', $id)->orderBy('label')->orderBy('name')->get()->groupBy('label'); // group by label column
         $product = Product::with(['variants.specifications', 'variants.attributeValues'])->findOrFail($id);
         $attributes = Attribute::with('values')->get();
-        
 
-
-
+        // echo "<pre>";
+        // print_r($attributes);exit;
 
         $categories = Category::where('is_parent', 1)->get();
         $items = Product::where('id', $id)->get();
-$subcategories = Category::where('is_parent', 0)
-                         ->get();
-        return view('backend.product.edit', compact('prospecifications','product', 'brands', 'categories', 'subcategories','items','attributes'));
+        $subcategories = Category::where('is_parent', 0)->get();
+        return view('backend.product.edit', compact('prospecifications', 'product', 'brands', 'categories', 'subcategories', 'items', 'attributes'));
     }
 
     /**
@@ -209,130 +202,111 @@ $subcategories = Category::where('is_parent', 0)
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-  public function update(Request $request, $id)
-{
+    public function update(Request $request, $id)
+    {
+        DB::beginTransaction();
+        //echo "<pre>";
 
-    echo "<pre>";
+        //print_r($request->brand_variants);exit;
+        try {
+            $product = Product::findOrFail($id);
 
- print_r($request->specifications);exit;
-    DB::beginTransaction();
-    try {
-        // 1. Find existing product
-        $product = Product::findOrFail($id);
+            // 1. Update main product fields
+            $product->update([
+                'title' => $request->title,
+                'slug' => Str::slug($request->title),
+                'summary' => $request->summary,
+                'description' => $request->description,
+                'photo' => $request->photo,
+                'status' => $request->status ?? 'inactive',
+                'price' => $request->has('has_variants') ? null : $request->price ?? null,
+                'discount' => $request->has('has_variants') ? null : $request->discount ?? null,
+                'stock' => $request->has('has_variants') ? null : $request->stock ?? null,
+                'sku' => $request->has('has_variants') ? null : $request->sku ?? null,
+                'is_featured' => $request->boolean('is_featured'),
+                'cat_id' => $request->cat_id,
+                'child_cat_id' => $request->child_cat_id,
+                'has_variants' => $request->has('has_variants') ? 1 : 0,
+            ]);
 
-        // 2. Update product fields
-        $product->title = $request->title;
-        $product->slug = Str::slug($request->title);
-        $product->summary = $request->summary;
-        $product->description = $request->description;
-        $product->status = $request->status ?? 'inactive';
-        $product->cat_id = $request->cat_id;
-        $product->child_cat_id = $request->child_cat_id;
-        $product->has_variants = $request->has('has_variants') ? 1 : 0;
+            // Sync brands
+            $product->brands()->sync($request->brand_ids ?? []);
 
-           if (!$request->has('has_variants')) {
-        $product->price = $request->price;
-        $product->discount = $request->discount;
-        $product->stock = $request->stock;
-        $product->sku = $request->sku;
-    }else {
-        $product->price = null;
-        $product->discount = null;
-        $product->stock = null;
-        $product->sku = null;
-    }
-        $product->save();
+            // 2. Handle variants
+            $product->variants()->delete(); // Remove old variants
 
-        // 3. Delete existing variants and their attribute values
-        foreach ($product->variants as $oldVariant) {
-            DB::table('product_variant_values')
-                ->where('product_variant_id', $oldVariant->id)
-                ->delete();
-            $oldVariant->delete();
-        }
-
-        // 4. Re-create variants if enabled
-        if ($request->has('has_variants') && $request->variant_data) {
-            foreach ($request->variant_data as $variant) {
-                // Create product variant
-                $pv = new ProductVariant();
-                $pv->product_id = $product->id;
-                $pv->sku = $variant['sku'] ?? null;
-                $pv->price = $variant['price'];
-                $pv->discount = $variant['discount'] ?? null;
-                $pv->stock = $variant['stock'] ?? 0;
-                $pv->brand_id = $variant['brand_id'];
-                $pv->variant_photo = $variant['variant_photo'] ?? null;
-                $pv->save();
-
-                // Save attribute-value pairs for this variant
-                if (isset($variant['attributes'])) {
-                    foreach ($variant['attributes'] as $attribute_id => $attribute_value_id) {
-                        DB::table('product_variant_values')->insert([
-                            'product_variant_id' => $pv->id,
-                            'attribute_id' => $attribute_id,
-                            'attribute_value_id' => $attribute_value_id,
-                            'created_at' => now(),
-                            'updated_at' => now(),
+            if ($request->has('has_variants') && is_array($request->brand_variants)) {
+                foreach ($request->brand_variants as $brandId => $variants) {
+                    foreach ($variants as $variant) {
+                        $pv = ProductVariant::create([
+                            'product_id' => $product->id,
+                            'sku' => $variant['sku'] ?? null,
+                            'price' => $variant['price'] ?? 0,
+                            'discount' => $variant['discount'] ?? null,
+                            'stock' => $variant['stock'] ?? 0,
+                            'brand_id' => $brandId,
+                            'variant_photo' => $variant['variant_photo'] ?? null,
                         ]);
+
+                        // Attributes
+                        if (!empty($variant['attributes']) && is_array($variant['attributes'])) {
+                            foreach ($variant['attributes']['attribute_id'] as $i => $attributeId) {
+                                DB::table('product_variant_values')->insert([
+                                    'product_variant_id' => $pv->id,
+                                    'attribute_id' => $attributeId,
+                                    'attribute_value_id' => $variant['attributes']['attribute_value_id'][$i] ?? null,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                            }
+                        }
+
+                        // Specifications
+                        if (!empty($variant['specifications']) && is_array($variant['specifications'])) {
+                            foreach ($variant['specifications'] as $spec) {
+                                if (!empty($spec['spec_name'])) {
+                                    VariantSpecification::create([
+                                        'product_variant_id' => $pv->id,
+                                        'spec_name' => $spec['spec_name'],
+                                        'spec_value' => $spec['spec_value'] ?? '',
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }
-                 if (!empty($variant['specifications']) && is_array($variant['specifications'])) {
-                    foreach ($variant['specifications'] as $spec) {
-                        if (!empty($spec['name'])) {
-                            VariantSpecification::create([
-                                'product_variant_id' => $pv->id,
-                                'spec_name'               => $spec['spec_name'],
-                                'spec_value'              => $spec['spec_value'] ?? '',
+            }
+
+            // 3. Handle specification groups
+            $product->specifications()->delete(); // Remove old specs
+
+            if ($request->has('spec_groups')) {
+                foreach ($request->spec_groups as $groupData) {
+                    $labelName = $groupData['label'] ?? '';
+                    if (!empty($groupData['specifications'])) {
+                        foreach ($groupData['specifications'] as $spec) {
+                            ProductSpecification::create([
+                                'product_id' => $product->id,
+                                'label' => $labelName,
+                                'name' => $spec['name'],
+                                'value' => $spec['value'],
                             ]);
                         }
                     }
                 }
             }
-        }
 
-        $existingSpecIds = [];
-    if ($request->has('specifications')) {
-        foreach ($request->input('specifications') as $spec) {
-            if (isset($spec['id'])) {
-                // Update existing
-                $existing = ProductSpecification::find($spec['id']);
-                if ($existing) {
-                    $existing->update([
-                        'name' => $spec['name'],
-                        'value' => $spec['value'],
-                    ]);
-                    $existingSpecIds[] = $existing->id;
-                }
-            } else {
-                // Create new
-                if (!empty($spec['name'])) {
-                    $newSpec = ProductSpecification::create([
-                        'product_id' => $product->id,
-                        'name' => $spec['name'],
-                        'value' => $spec['value'] ?? '',
-                    ]);
-                    $existingSpecIds[] = $newSpec->id;
-                }
-            }
+            DB::commit();
+            return redirect()->route('product.index')->with('success', 'Product updated successfully.');
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            exit();
+            DB::rollBack();
+            return back()
+                ->with('error', 'Failed to update product: ' . $e->getMessage())
+                ->withInput();
         }
     }
-
-    // Delete removed specifications
-    $product->specifications()
-        ->whereNotIn('id', $existingSpecIds)
-        ->delete();
-
-       $product->brands()->sync($request->brand_ids);
-        
-        DB::commit();
-        return redirect()->route('product.index')->with('success', 'Product updated successfully.');
-
-    } catch (\Exception $e) {
-        DB::rollback();
-        return back()->with('error', 'Failed to update product: ' . $e->getMessage());
-    }
-}
 
     /**
      * Remove the specified resource from storage.
@@ -340,34 +314,31 @@ $subcategories = Category::where('is_parent', 0)
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-   public function destroy($id)
-{
-    DB::beginTransaction();
-    try {
-        $product = Product::findOrFail($id);
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            $product = Product::findOrFail($id);
 
-        // Delete variants and their attribute values
-        foreach ($product->variants as $variant) {
-            DB::table('product_variant_values')
-                ->where('product_variant_id', $variant->id)
-                ->delete();
+            // Delete variants and their attribute values
+            foreach ($product->variants as $variant) {
+                DB::table('product_variant_values')->where('product_variant_id', $variant->id)->delete();
 
-            $variant->delete();
+                $variant->delete();
+            }
+
+            // Optionally: delete product images if stored in filesystem
+            // if ($product->photo && Storage::exists($product->photo)) {
+            //     Storage::delete($product->photo);
+            // }
+
+            $product->delete();
+
+            DB::commit();
+            return redirect()->route('product.index')->with('success', 'Product deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to delete product: ' . $e->getMessage());
         }
-
-        // Optionally: delete product images if stored in filesystem
-        // if ($product->photo && Storage::exists($product->photo)) {
-        //     Storage::delete($product->photo);
-        // }
-
-        $product->delete();
-
-        DB::commit();
-        return redirect()->route('product.index')->with('success', 'Product deleted successfully.');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('error', 'Failed to delete product: ' . $e->getMessage());
     }
-}
 }
