@@ -1,6 +1,7 @@
 <div class="tf-shop-control">
                     <div class="tf-control-filter">
-                        <button id="filterShop" class="filterShop tf-btn-filter"><span class="icon icon-filter"></span><span class="text">Filters</span></button>
+                        <button id="filterShop" class="filterShop tf-btn-filter">
+                            <span class="icon icon-filter"></span><span class="text">Filters</span></button>
                         
                     </div>
                     <ul class="tf-control-layout">

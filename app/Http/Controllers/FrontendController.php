@@ -24,9 +24,24 @@ class FrontendController extends Controller
         return redirect()->route($request->user()->role);
     }
 
-    public function home(){
+     public function home(){
         return view('frontend.home');
-        //return view('frontend.categories_product');
+     }
+
+     public function categories(){
+          return view('frontend.categories_product');
+        
+     }
+
+      public function products(){
+        return view('frontend.product_listing');
+     }  
+
+
+    public function home1(){
+        //return view('frontend.home');
+        //return view('frontend.product_listing');
+         return view('frontend.categories_product');
         echo "Welcome to SENBA";exit;
         $featured=Product::where('status','active')->where('is_featured',1)->orderBy('price','DESC')->limit(2)->get();
         $posts=Post::where('status','active')->orderBy('id','DESC')->limit(3)->get();

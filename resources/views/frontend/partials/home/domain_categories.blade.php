@@ -5,9 +5,9 @@
         ['title' => 'Waste Water Solutions','image' => 'frontend/images/collections/cls-bookstore-6.jpg', 'items' => 24],
         ['title' => 'Solar Pumps',          'image' => 'frontend/images/collections/cls-bookstore-7.jpg', 'items' => 8],
         ['title' => 'Domestic Pumps',       'image' => 'frontend/images/collections/cls-bookstore-8.jpg', 'items' => 26],
-        ['title' => 'Accessories',          'image' => 'frontend/images/collections/cls-bookstore-9.jpg', 'items' => 16],
+       
     ];
-    $chunks = array_chunk($collections, 4);
+    $chunks = array_chunk($collections, 5);
 @endphp
 
 <section class="flat-spacing">
@@ -16,13 +16,13 @@
             <h3>Shop by Categories</h3>
         </div>
 
-        <div id="collectionCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div id="collectionCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
             <div class="carousel-inner">
                 @foreach ($chunks as $index => $chunk)
                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                        <div class="row gx-3 justify-content-center">
+                        <div class="row gx-2 justify-content-center">
                             @foreach ($chunk as $collection)
-                                <div class="col-md-3 col-6">
+                                <div class="col-md-2 col-6">
                                     <div class="card border-0 text-center collection-card">
                                         <img src="{{ asset($collection['image']) }}" class="img-fluid rounded mb-2" alt="{{ $collection['title'] }}">
                                         <div class="fw-semibold collection-title">{{ $collection['title'] }}</div>

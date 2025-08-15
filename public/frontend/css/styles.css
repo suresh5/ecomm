@@ -1912,8 +1912,8 @@ a:focus, a:hover {
 }
 
 #header .box-nav-ul .item-link {
-  font-size: 16px;
-  line-height: 26px;
+  font-size: 18px;
+  line-height: 40px;
   font-weight: 600;
   display: flex;
   align-items: center;

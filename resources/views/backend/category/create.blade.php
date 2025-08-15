@@ -39,7 +39,7 @@
 
 <div class="form-group col-md-6">
     <label for="engname">slug</label>
-    <input type="text" name="engname" class="form-control" value="{{ old('slug', $category->slug ?? '') }}">
+    <input type="text" name="slug" class="form-control" value="{{ old('slug', $category->slug ?? '') }}">
 </div>
 </div>
  <div class="row">

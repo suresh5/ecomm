@@ -37,7 +37,8 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+{//dd($request->all());
+    try {
         $validatedData = $request->validate([
             'title' => 'required|string',
             'summary' => 'nullable|string',
@@ -50,12 +51,10 @@ class CategoryController extends Controller
             'slug' => 'required|string|unique:categories,slug',
             'ishomepage' => 'nullable|boolean',
             'position' => 'required|in:center,side',
-             'sort_order' => 'nullable|integer|min:0',
-              'menu_position' => 'nullable|in:main,extra,home',
+            'sort_order' => 'nullable|integer|min:0',
+            'menu_position' => 'nullable|in:main,extra,home',
         ]);
 
-        // $slug = generateUniqueSlug($request->engname, Category::class);
-        // $validatedData['slug'] = $slug;
         $validatedData['is_parent'] = $request->input('is_parent', 0);
         $validatedData['ishomepage'] = $request->has('ishomepage') ? 1 : 0;
 
@@ -66,15 +65,22 @@ class CategoryController extends Controller
             $category->attributeValues()->sync($valueIds); // Many-to-many relation
         }
 
-        $message = $category
-            ? 'Category successfully added'
-            : 'Error occurred, Please try again!';
+        return redirect()
+            ->route('category.index')
+            ->with('success', 'Category successfully added');
+    } catch (\Throwable $e) {
+        // Log the error for debugging
+        echo $e->getMessage();exit;
+        \Log::error('Category Store Error: '.$e->getMessage(), [
+            'trace' => $e->getTraceAsString()
+        ]);
 
-        return redirect()->route('category.index')->with(
-            $category ? 'success' : 'error',
-            $message
-        );
+        return redirect()
+            ->route('category.index')
+            ->with('error', 'An error occurred while adding the category. Please try again.');
     }
+}
+
 
     /**
      * Display the specified resource.

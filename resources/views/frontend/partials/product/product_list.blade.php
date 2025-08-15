@@ -1,7 +1,7 @@
 @php
     $products = [
         [
-            'title' => 'Double-button trench coat',
+            'title' => 'AMB - Mini Booster Pump',
             'price_old' => '$98.00',
             'price' => '$219.99',
             'img1' => 'frontend/images/products/motor.jpg',

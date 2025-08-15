@@ -1,5 +1,5 @@
  <header id="header" class="header-default header-style-5 header-white">
-            <div class="main-header bg-blue-2">
+            <div class="main-header bg-purple">
                 <div class="container">
                     <div class="row wrapper-header align-items-center line-top-rgba">
                         <div class="col-md-4 col-3 d-xl-none">
@@ -15,38 +15,7 @@
                                 <div class="d-xl-block d-none">
                                     <form>
                                         <div class="form-search-select">
-                                            <div class="tf-dropdown-sort" data-bs-toggle="dropdown">
-                                                <div class="btn-select">
-                                                    <span class="text-sort-value">All</span>
-                                                    <span class="icon icon-arrow-down"></span>
-                                                </div>
-                                                <div class="dropdown-menu">
-                                                    <div class="select-item active">
-                                                        <span class="text-value-item">All</span>
-                                                    </div>
-                                                    <div class="select-item">
-                                                        <span class="text-value-item">Best selling</span>
-                                                    </div>
-                                                    <div class="select-item">
-                                                        <span class="text-value-item">Alphabetically, A-Z</span>
-                                                    </div>
-                                                    <div class="select-item">
-                                                        <span class="text-value-item">Alphabetically, Z-A</span>
-                                                    </div>
-                                                    <div class="select-item">
-                                                        <span class="text-value-item">Price, low to high</span>
-                                                    </div>
-                                                    <div class="select-item">
-                                                        <span class="text-value-item">Price, high to low</span>
-                                                    </div>
-                                                    <div class="select-item">
-                                                        <span class="text-value-item">Date, old to new</span>
-                                                    </div>
-                                                    <div class="select-item">
-                                                        <span class="text-value-item">Date, new to old</span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                           
                                             <input type="text" placeholder="What are you looking for today?">
                                             <button class="tf-btn"><span class="text">Search</span></button>
                                         </div>
@@ -58,13 +27,7 @@
                         </div>
                         <div class="col-xl-4 col-md-4 col-3">
                             <div class="wrapper-header-right">
-                                <div class="d-none d-xl-flex box-support">
-                                    <span class="text-white icon icon-lifebuoy"></span>
-                                    <div>
-                                        <div class="text-title text-white">Hotline: +01 1234 8888</div>
-                                        <div class="text-white text-caption-2">24/7 Support Center</div>
-                                    </div>
-                                </div>
+                                 
                                 <ul class="nav-icon d-flex justify-content-end align-items-center">
                                     <li class="nav-search d-inline-flex d-xl-none"><a href="#search" data-bs-toggle="modal" class="nav-icon-item">
                                         <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -109,44 +72,15 @@
                     </div>
                 </div>
             </div>
-            <div class="header-bottom bg-blue-3 d-none d-xl-block">
+            <div class="header-bottom bg-purple d-none d-xl-block">
                 <div class="container">
-                    <div class="wrapper-header d-flex justify-content-between align-items-center">
+                    <div class="wrapper-header d-flex justify-content-center align-items-center">
                         <div class="box-left">
-                            @php
-    $categories = [
-        ['title' => 'Electronics', 'icon' => 'icon-laptop'],
-        ['title' => 'Appliances', 'icon' => 'icon-tv'],
-        ['title' => 'Kitchen', 'icon' => 'icon-software'],
-        ['title' => 'Audio', 'icon' => 'icon-audio'],
-        ['title' => 'Smart Home', 'icon' => 'icon-smartphone'],
-        ['title' => 'Gaming', 'icon' => 'icon-headphones'],
-        ['title' => 'Office', 'icon' => 'icon-camera'],
-        ['title' => 'Security', 'icon' => 'icon-security']
-    ];
-@endphp
+                           
 
 <div class="tf-list-categories">
-    <a href="#" class="categories-title">
-        <span class="icon-left icon-squares-four"></span>
-        <span class="text">Shop By Categories</span>
-        <span class="icon icon-arrow-down"></span>
-    </a>
-    <div class="list-categories-inner">
-        <ul>
-            @foreach ($categories as $category)
-                <li>
-                    <a href="#" class="categories-item">
-                        <span class="inner-left">
-                            <i class="icon {{ $category['icon'] }}"></i> {{ $category['title'] }}
-                        </span>
-                    </a>
-                </li>
-            @endforeach
-        </ul>
-
-         
-    </div>
+     
+     
 </div>
                             <nav class="box-navigation">
                                 <ul class="box-nav-ul d-flex align-items-center">

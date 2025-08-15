@@ -20,10 +20,13 @@
     <input type="checkbox" name="ishomepage" class="form-check-input" id="ishomepage" value="1" {{ old('ishomepage', $category->ishomepage ?? false) ? 'checked' : '' }}>
     <label class="form-check-label" for="ishomepage">Show on Homepage</label>
 </div>
-
+<div class="form-group col-md-6">
+    <label for="engname">English Name</label>
+    <input type="text" name="engname" class="form-control" value="{{ old('engname', $category->engname ?? '') }}">
+</div>
 <div class="form-group">
     <label for="engname">slug</label>
-    <input type="text" name="engname" class="form-control" value="{{ old('slug', $category->slug ?? '') }}">
+    <input type="text" name="slug" class="form-control" value="{{ old('slug', $category->slug ?? '') }}">
 </div>
 
 <div class="form-group">

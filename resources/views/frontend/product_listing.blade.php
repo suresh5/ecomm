@@ -4,7 +4,7 @@
 
 @section('content')
         <!-- page-title -->
-        <div class="page-title" style="background-image: url('{{ asset('frontend/images/section/page-title.jpg') }}');">
+        <div class="page-title" style="background-image: url('{{ asset('frontend/images/products/motor.jpg') }}');">
             <div class="container-full">
                 <div class="row">
                     <div class="col-12">
@@ -17,37 +17,29 @@
                                 <i class="icon-arrRight"></i>
                             </li>
                             <li>
-                                Pumps
+                                Products
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
-        
         <!-- /page-title -->
 
          <section class="flat-spacing">
             <div class="container">
-                <div class="tf-shop-control">
+                  <div class="tf-shop-control">
                     <div class="tf-control-filter">
-                        <button id="filterShop" class="filterShop tf-btn-filter">
-                            <span class="icon icon-filter"></span><span class="text">Filters</span></button>
-                        
+                        <button id="filterShop" class="filterShop tf-btn-filter"><span class="icon icon-filter"></span><span class="text">Filters</span></button>
+                        <div class="d-none d-lg-flex shop-sale-text">
+                             
+                        </div>
                     </div>
-                    <ul class="tf-control-layout">
-                       
-                    </ul>
-                    
+                   
+                    <div class="tf-control-sorting">
+                         
+                    </div>
                 </div>
-                 <!-- <div class="d-flex justify-content-center gap-4 mb-4">
-            <button class="btn btn-primary">Agriculture</button>
-            <button class="btn btn-secondary">Building Services</button>
-            <button class="btn btn-success">Waste Water Solutions</button>
-            <button class="btn btn-success">Solar Pumps</button>
-            <button class="btn btn-success">Domestic Pumps</button>
-        </div> -->
-         
                 <div class="wrapper-control-shop">
                     <div class="meta-filter-shop">
                         <div id="product-count-grid" class="count-text"></div>
@@ -57,11 +49,11 @@
                     </div>
                       <div class="row">
                         <div class="col-xl-3">
-                            @include('frontend.partials.categories.category_only_filter')
+                            @include('frontend.partials.product.product_filter')
                         </div>
                         <div class="col-xl-9">
 
-                             @include('frontend.partials.categories.product_list')
+                             @include('frontend.partials.product.product_list')
                         </div>
                 </div>
             </div>

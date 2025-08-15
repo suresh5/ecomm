@@ -628,11 +628,11 @@
   };
 
   $(function () {
-    rangeTwoPrice();
-    filterProducts();
-    filterSort();
-    swLayoutShop();
+    // rangeTwoPrice();
+    // filterProducts();
+    // filterSort();
+    // swLayoutShop();
     handleSidebarFilter();
-    handleDropdownFilter();
+    //handleDropdownFilter();
   });
 })(jQuery);

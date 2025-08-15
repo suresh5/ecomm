@@ -10,7 +10,7 @@ use App\Models\Brand;
 use App\Models\ProductVariant;
 use App\Models\VariantSpecification;
 use App\Models\ProductVariantValue;
-
+use App\Models\ProductSpecification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -54,9 +54,9 @@ class ProductController extends Controller
 {
     //echo "coming";exit;
     DB::beginTransaction();
-// echo "<pre>";
+ echo "<pre>";
 
- //print_r($request->brand_variants);exit;
+ //print_r($request->spec_groups);exit;
     try {
         // 1. Create the main product
         $product = Product::create([
@@ -82,6 +82,7 @@ class ProductController extends Controller
         // 2. Handle product variants (if applicable)
         if ($request->has('has_variants') && is_array($request->brand_variants)) {
             foreach ($request->brand_variants as $variant) {
+                //echo $variant['brand_id'];exit;
                 $pv = ProductVariant::create([
                     'product_id'     => $product->id,
                     'sku'            => $variant['sku'] ?? null,
@@ -121,14 +122,32 @@ class ProductController extends Controller
         }
 
         // 3. Save general specifications (for simple products)
-        if (is_array($request->specifications)) {
-            foreach ($request->specifications as $spec) {
-                if (!empty($spec['name'])) {
-                    ProductSpecification::create([
-                        'product_id' => $product->id,
-                        'name'       => $spec['name'],
-                        'value'      => $spec['value'] ?? '',
-                    ]);
+        // if (is_array($request->specifications)) {
+        //     foreach ($request->specifications as $spec) {
+        //         if (!empty($spec['name'])) {
+        //             ProductSpecification::create([
+        //                 'product_id' => $product->id,
+        //                 'name'       => $spec['name'],
+        //                 'value'      => $spec['value'] ?? '',
+        //             ]);
+        //         }
+        //     }
+        // }
+
+       if ($request->has('spec_groups')) {
+            foreach ($request->spec_groups as $groupData) {
+                 
+                $labelName =  $groupData['label'];
+                // Save specifications under the group
+                if (!empty($groupData['specifications'])) {
+                    foreach ($groupData['specifications'] as $spec) {
+                        ProductSpecification::create([
+                            'product_id' => $product->id,
+                            'label' => $labelName,
+                            'name' => $spec['name'],
+                            'value' => $spec['value']
+                        ]);
+                    }
                 }
             }
         }
@@ -164,8 +183,12 @@ class ProductController extends Controller
     {
         $brands = Brand::get();
         $product = Product::findOrFail($id);
-
-        $product = Product::with(['variants.specifications', 'variants.attributeValues','specifications'])->findOrFail($id);
+         $prospecifications = ProductSpecification::where('product_id', $id)
+        ->orderBy('label')
+        ->orderBy('name')
+        ->get()
+        ->groupBy('label'); // group by label column
+        $product = Product::with(['variants.specifications', 'variants.attributeValues'])->findOrFail($id);
         $attributes = Attribute::with('values')->get();
         
 
@@ -176,7 +199,7 @@ class ProductController extends Controller
         $items = Product::where('id', $id)->get();
 $subcategories = Category::where('is_parent', 0)
                          ->get();
-        return view('backend.product.edit', compact('product', 'brands', 'categories', 'subcategories','items','attributes'));
+        return view('backend.product.edit', compact('prospecifications','product', 'brands', 'categories', 'subcategories','items','attributes'));
     }
 
     /**
