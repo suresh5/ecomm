@@ -24,39 +24,46 @@ class FrontendController extends Controller
         return redirect()->route($request->user()->role);
     }
 
+
      public function home(){
-        return view('frontend.home');
-     }
-
-     public function categories(){
-          return view('frontend.categories_product');
-        
-     }
-
-      public function products(){
-        return view('frontend.product_listing');
-     }  
-
-
-    public function home1(){
-        //return view('frontend.home');
-        //return view('frontend.product_listing');
-         return view('frontend.categories_product');
-        echo "Welcome to SENBA";exit;
         $featured=Product::where('status','active')->where('is_featured',1)->orderBy('price','DESC')->limit(2)->get();
-        $posts=Post::where('status','active')->orderBy('id','DESC')->limit(3)->get();
+        //$posts=Post::where('status','active')->orderBy('id','DESC')->limit(3)->get();
         $banners=Banner::where('status','active')->limit(3)->orderBy('id','DESC')->get();
         // return $banner;
-        $products=Product::where('status','active')->orderBy('id','DESC')->limit(8)->get();
+       
+        $products = Product::with([
+        'variants.attributeValues.attribute'
+    ])
+    ->latest()
+    ->take(12) // show 12 products for homepage
+    ->get();
+        $categories = Category::where('is_parent', 1)
+        ->with('children')
+        ->get();
         $category=Category::where('status','active')->where('is_parent',1)->orderBy('title','ASC')->get();
         // return $category;
         return view('frontend.index')
                 ->with('featured',$featured)
-                ->with('posts',$posts)
                 ->with('banners',$banners)
+                ->with('categories', $categories)
                 ->with('product_lists',$products)
                 ->with('category_lists',$category);
-    }   
+    } 
+    //  public function home(){
+    //     return view('frontend.home');
+    //  }
+
+    //  public function categories(){
+    //       return view('frontend.categories_product');
+        
+    //  }
+
+    //   public function products(){
+    //     return view('frontend.product_listing');
+    //  }  
+
+
+    
 
     public function aboutUs(){
         return view('frontend.pages.about-us');

@@ -280,25 +280,61 @@
     }
 });
 
-    document.addEventListener('click', function (e) {
-        // Add attribute
-        
-
-         if (e.target.classList.contains('add-attribute')) {
+// Handle click events
+document.addEventListener('click', function (e) {
+    // Add attribute
+    if (e.target.classList.contains('add-attribute')) {
         const index = e.target.dataset.index;
         const container = document.querySelector(`.attribute-area-${index}`);
         const count = container.querySelectorAll('.attribute-row').length;
 
         container.insertAdjacentHTML('beforeend', renderAttributeBlock(index, count));
 
-         // Show price-stock block
-            const priceStock = document.getElementById(`price-stock-${index}`);
-            if (priceStock && priceStock.classList.contains('d-none')) {
-                priceStock.classList.remove('d-none');
-            }
+        // Show price-stock block
+        const priceStock = document.getElementById(`price-stock-${index}`);
+        if (priceStock && priceStock.classList.contains('d-none')) {
+            priceStock.classList.remove('d-none');
+        }
     }
 
-    document.addEventListener('change', function (e) {
+    // Remove attribute
+    if (e.target.classList.contains('remove-attr')) {
+        const vIdx = e.target.dataset.index;
+        e.target.closest('.attribute-row').remove();
+
+        const attrArea = document.querySelector(`.attribute-area-${vIdx}`);
+        const remaining = attrArea.querySelectorAll('.attribute-row').length;
+        const priceStock = document.getElementById(`price-stock-${vIdx}`);
+        if (remaining === 0 && priceStock) {
+            priceStock.classList.add('d-none');
+        }
+    }
+
+    // Add spec
+    if (e.target.classList.contains('add-variant-spec')) {
+        const vIdx = e.target.dataset.index;
+        const specArea = document.querySelector(`.spec-area-${vIdx}`);
+        const specCount = specArea.querySelectorAll('.spec-row').length;
+        specArea.insertAdjacentHTML('beforeend', renderSpecification(specCount, vIdx));
+    }
+
+    // Remove spec
+    if (e.target.classList.contains('remove-spec')) {
+         const vIdx = e.target.dataset.index;
+    const row = e.target.closest(`.spec-row-${vIdx}`);
+    if (row) row.remove();
+        
+       
+    }
+
+    // Remove entire variant block
+    if (e.target.classList.contains('remove-variant')) {
+        e.target.closest('.variant-block').remove();
+    }
+});
+
+// Handle attribute change separately
+document.addEventListener('change', function (e) {
     if (e.target.classList.contains('attribute-select')) {
         const attrId = parseInt(e.target.value);
         const selectedAttr = attributes.find(attr => attr.id === attrId);
@@ -318,39 +354,12 @@
     }
 });
 
-        // Remove attribute
-        if (e.target.classList.contains('remove-attr')) {
-            const vIdx = e.target.dataset.index;
-            e.target.closest(`.attr-row-${vIdx}`).remove();
 
-            const attrArea = document.querySelector(`.attribute-area-${vIdx}`);
-            const remaining = attrArea.querySelectorAll(`.attr-row-${vIdx}`).length;
-            const priceStock = document.getElementById(`price-stock-${vIdx}`);
-            if (remaining === 0 && priceStock) {
-                priceStock.classList.add('d-none');
-            }
-        }
 
-        // Add spec
-        if (e.target.classList.contains('add-variant-spec')) {
-            const vIdx = e.target.dataset.index;
-            const specArea = document.querySelector(`.spec-area-${vIdx}`);
-            const specCount = specArea.querySelectorAll(`.spec-row-${vIdx}`).length;
-            specArea.insertAdjacentHTML('beforeend', renderSpecification(specCount, vIdx));
-        }
 
-        // Remove spec
-        if (e.target.classList.contains('remove-spec')) {
-            const vIdx = e.target.dataset.index;
-            e.target.closest(`.spec-row-${vIdx}`).remove();
-        }
 
-        // Remove entire variant block
-        if (e.target.classList.contains('remove-variant')) {
-            e.target.closest('.variant-block').remove();
-        }
-    });
-</script>
+ </script>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

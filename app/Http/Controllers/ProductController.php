@@ -154,7 +154,7 @@ class ProductController extends Controller
             return redirect()->route('product.index')->with('success', 'Product created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            //echo $e->getMessage();exit;
+            echo $e->getMessage();exit;
             return back()
                 ->with('error', 'Failed to create product: ' . $e->getMessage())
                 ->withInput();
@@ -341,4 +341,15 @@ class ProductController extends Controller
             return back()->with('error', 'Failed to delete product: ' . $e->getMessage());
         }
     }
+
+    public function showDetail($slug)
+{
+    $product = Product::with(['variants.attributeValues.attribute', 'specifications', 'cat_info',                           // parent category
+        'sub_cat_info'])
+                ->where('slug', $slug)
+                ->firstOrFail();
+
+    return view('frontend.product_detail', compact('product'));
+}
+    
 }

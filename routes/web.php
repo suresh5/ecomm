@@ -5,6 +5,7 @@
     use App\Http\Controllers\AdminController;
     use App\Http\Controllers\Auth\ForgotPasswordController;
     use App\Http\Controllers\FrontendController;
+      use App\Http\Controllers\CategoryController;
     use App\Http\Controllers\Auth\LoginController;
     use App\Http\Controllers\MessageController;
     use App\Http\Controllers\CartController;
@@ -19,6 +20,8 @@
     use App\Http\Controllers\HomeController;
     use \UniSharp\LaravelFilemanager\Lfm;
     use App\Http\Controllers\Auth\ResetPasswordController;
+
+     use App\Http\Controllers\ProductController;
     /*
     |--------------------------------------------------------------------------
     | Web Routes
@@ -68,16 +71,17 @@
     Route::get('/categories-demo', [FrontendController::class, 'categories']);
     Route::get('/products-demo', [FrontendController::class, 'products']);
 
+    Route::get('/category/{slug}', [CategoryController::class, 'frontendViewProductsForCategory'])->name('category.products');
 
 
-
-
+    Route::get('/products', [CategoryController::class, 'allProductsPage'])->name('products');
+     Route::get('/product/{slug}', [ProductController::class, 'showDetail'])->name('product.detail');
 // Frontend Routes
     Route::get('/home', [FrontendController::class, 'index']);
     Route::get('/about-us', [FrontendController::class, 'aboutUs'])->name('about-us');
     Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
     Route::post('/contact/message', [MessageController::class, 'store'])->name('contact.store');
-    Route::get('product-detail/{slug}', [FrontendController::class, 'productDetail'])->name('product-detail');
+   // Route::get('product-detail/{slug}', [FrontendController::class, 'productDetail'])->name('product-detail');
     Route::post('/product/search', [FrontendController::class, 'productSearch'])->name('product.search');
     Route::get('/product-cat/{slug}', [FrontendController::class, 'productCat'])->name('product-cat');
     Route::get('/product-sub-cat/{slug}/{sub_slug}', [FrontendController::class, 'productSubCat'])->name('product-sub-cat');

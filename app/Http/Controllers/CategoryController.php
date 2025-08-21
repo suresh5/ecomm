@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\Attribute;
 class CategoryController extends Controller
 {
@@ -197,4 +198,137 @@ class CategoryController extends Controller
 
         return response()->json(['status' => true, 'msg' => '', 'data' => $child_cat]);
     }
+
+
+     public function frontendViewProductsForCategory($slug)
+{
+    // Find category with subcategories
+    $category = Category::with('children')->where('slug', $slug)->firstOrFail();
+
+    if ($category->children->isNotEmpty()) {
+        // Get products from all subcategories
+        $subCategoryIds = $category->children->pluck('id')->toArray();
+
+        $product_lists = Product::with([
+            'variants.attributeValues.attribute', // variants with attributes
+            'specifications'                   // technical specifications                            // product images
+        ])->whereIn('child_cat_id', $subCategoryIds)->get();
+
+    } else {
+        // No subcategories → products directly under this category
+        $product_lists = Product::with([
+            'variants.attributeValues.attribute',
+            'specifications'
+        ])->where('cat_id', $category->id)
+          ->orWhere('child_cat_id', $category->id)
+          ->get();
+    }
+
+    return view('frontend.category_products', compact('category', 'product_lists'));
+}
+
+
+
+
+
+
+ public function productFilter(Request $request, $slug)
+    {
+        // Get the current category by slug
+        $category = Category::with('parent', 'children')->where('slug', $slug)->firstOrFail();
+
+        // Load parent categories (for sidebar tree)
+        $parentCategories = Category::with('children')->whereNull('parent_id')->get();
+
+        // Query products under this category (including child categories)
+        $categoryIds = $category->children->pluck('id')->push($category->id);
+        $productsQuery = Product::with([
+            'variants.attributeValues.attribute',
+            'specifications'
+        ]);
+
+        /**
+         * ---- APPLY FILTERS ----
+         */
+        // Price range
+        if ($request->has('min_price') && $request->has('max_price')) {
+            $productsQuery->whereBetween('price', [
+                $request->min_price, 
+                $request->max_price
+            ]);
+        }
+
+        // Attributes (variants filter)
+        if ($request->has('filter')) {
+            foreach ($request->filter as $attrName => $values) {
+                $productsQuery->whereHas('attributes', function($q) use ($attrName, $values) {
+                    $q->where('name', $attrName)
+                      ->whereIn('value_id', $values);
+                });
+            }
+        }
+
+        // Sorting
+        switch ($request->get('sort')) {
+            case 'price_low_high':
+                $productsQuery->orderBy('price', 'asc');
+                break;
+            case 'price_high_low':
+                $productsQuery->orderBy('price', 'desc');
+                break;
+            case 'latest':
+            default:
+                $productsQuery->latest();
+                break;
+        }
+
+        // Paginate products
+        $products = $productsQuery->paginate(12);
+
+        /**
+         * ---- BUILD FILTER DATA ----
+         * Example: attributes grouped for sidebar
+         */
+        $filters = [
+            'attributes' => Product::getAvailableAttributes($categoryIds) // custom static function
+        ];
+
+        return view('frontend.products', compact(
+            'category',
+            'parentCategories',
+            'products',
+            'filters'
+        ));
+    }
+
+
+
+
+
+
+
+public function allProductsPage(Request $request)
+{
+    // --- 1. Get all categories with children (subcategories) ---
+    $categories = Category::with('children')->whereNull('parent_id')->get();
+
+    // --- 2. Get all attributes with their values ---
+    $attributes = Attribute::with('values')->get();
+
+    // --- 3. Get all products with relationships, paginated ---
+    $products = Product::with([
+        'variants.attributeValues.attribute', // variant attribute values
+        'specifications',                     // product specifications
+        'cat_info',                           // parent category
+        'sub_cat_info'                         // child category
+    ])->paginate(12);
+
+    // --- 4. Return view ---
+    return view('frontend.products', compact('categories', 'attributes', 'products'));
+}
+
+
+
+
+
 }

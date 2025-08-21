@@ -88,4 +88,9 @@ public function allDescendantIds()
     return $this->children()->pluck('id')->merge([$this->id]);
 }
 
+public function parent()
+{
+    return $this->belongsTo(Category::class, 'parent_id');
+}
+
 }
