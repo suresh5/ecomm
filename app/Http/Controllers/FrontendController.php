@@ -25,7 +25,7 @@ class FrontendController extends Controller
     }
 
 
-     public function home(){
+     public function home1(){
         $featured=Product::where('status','active')->where('is_featured',1)->orderBy('price','DESC')->limit(2)->get();
         //$posts=Post::where('status','active')->orderBy('id','DESC')->limit(3)->get();
         $banners=Banner::where('status','active')->limit(3)->orderBy('id','DESC')->get();
@@ -49,9 +49,10 @@ class FrontendController extends Controller
                 ->with('product_lists',$products)
                 ->with('category_lists',$category);
     } 
-    //  public function home(){
-    //     return view('frontend.home');
-    //  }
+     public function home(){
+        $category=Category::with('children')->where('status','active')->where('is_parent',1)->orderBy('title','ASC')->get();
+        return view('frontendtheme.home')->with('parentCategories',$category);
+     }
 
     //  public function categories(){
     //       return view('frontend.categories_product');

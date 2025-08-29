@@ -224,7 +224,8 @@ class CategoryController extends Controller
           ->get();
     }
 
-    return view('frontend.category_products', compact('category', 'product_lists'));
+    $parentCategories = Category::with('children')->whereNull('parent_id')->get();
+    return view('frontendtheme.category_products', compact('category', 'parentCategories', 'product_lists'));
 }
 
 
@@ -310,7 +311,7 @@ class CategoryController extends Controller
 public function allProductsPage(Request $request)
 {
     // --- 1. Get all categories with children (subcategories) ---
-    $categories = Category::with('children')->whereNull('parent_id')->get();
+    $parentCategories = Category::with('children')->whereNull('parent_id')->get();
 
     // --- 2. Get all attributes with their values ---
     $attributes = Attribute::with('values')->get();
@@ -324,7 +325,7 @@ public function allProductsPage(Request $request)
     ])->paginate(12);
 
     // --- 4. Return view ---
-    return view('frontend.products', compact('categories', 'attributes', 'products'));
+    return view('frontendtheme.products', compact('parentCategories', 'attributes', 'products'));
 }
 
 

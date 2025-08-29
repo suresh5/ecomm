@@ -138,6 +138,16 @@
     Route::get('payment/success', [PayPalController::class, 'success'])->name('payment.success');
 
 
+    Route::get('storage/{path}', function ($path) {
+    $file = storage_path('app/public/' . $path);
+
+    if (!file_exists($file)) {
+        abort(404);
+    }
+
+    return response()->file($file);
+})->where('path', '.*');
+
 // Backend section start
 
     Route::group(['prefix' => '/admin', 'middleware' => ['auth', 'admin']], function () {

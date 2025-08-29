@@ -8,9 +8,13 @@
                         <div class="row g-0">
                             <!-- Left: Main Category -->
                             <div class="col-md-3 d-flex flex-column justify-content-center align-items-center p-3 border-end">
-                                <img src="{{ $category->photo ?? '/default-category.png' }}" 
+                                <!-- <img src="{{ $category->photo ?? '/default-category.png' }}" 
                                      alt="{{ $category->title }}" 
-                                     class="img-fluid rounded mb-2" style="max-height:120px; object-fit:contain;">
+                                     class="img-fluid rounded mb-2" style="max-height:120px; object-fit:contain;"> -->
+
+                                     <img src="{{ $category->photo ? asset($category->photo) : asset('default-category.png') }}" 
+     alt="{{ $category->title }}" class="img-fluid rounded mb-2" style="max-height:120px; object-fit:contain;">
+
                                 <h5 class="fw-bold mb-2">{{ $category->title }}</h5>
                                 <a href="{{ route('category.products', $category->slug) }}" class="btn btn-primary btn-sm">
                                     View Products
