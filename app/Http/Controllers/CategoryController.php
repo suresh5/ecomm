@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Attribute;
+
 class CategoryController extends Controller
 {
     /**
@@ -38,49 +39,50 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-{//dd($request->all());
-    try {
-        $validatedData = $request->validate([
-            'title' => 'required|string',
-            'summary' => 'nullable|string',
-            'photo' => 'nullable|string',
-            'status' => 'required|in:active,inactive',
-            'is_parent' => 'sometimes|in:1',
-            'parent_id' => 'nullable|exists:categories,id',
-            'attribute_values' => 'nullable|array',
-            'engname' => 'required|string|unique:categories,engname',
-            'slug' => 'required|string|unique:categories,slug',
-            'ishomepage' => 'nullable|boolean',
-            'position' => 'required|in:center,side',
-            'sort_order' => 'nullable|integer|min:0',
-            'menu_position' => 'nullable|in:main,extra,home',
-        ]);
+    { //dd($request->all());
+        try {
+            $validatedData = $request->validate([
+                'title' => 'required|string',
+                'summary' => 'nullable|string',
+                'photo' => 'nullable|string',
+                'status' => 'required|in:active,inactive',
+                'is_parent' => 'sometimes|in:1',
+                'parent_id' => 'nullable|exists:categories,id',
+                'attribute_values' => 'nullable|array',
+                'engname' => 'required|string|unique:categories,engname',
+                'slug' => 'required|string|unique:categories,slug',
+                'ishomepage' => 'nullable|boolean',
+                'position' => 'required|in:center,side',
+                'sort_order' => 'nullable|integer|min:0',
+                'menu_position' => 'nullable|in:main,extra,home',
+            ]);
 
-        $validatedData['is_parent'] = $request->input('is_parent', 0);
-        $validatedData['ishomepage'] = $request->has('ishomepage') ? 1 : 0;
+            $validatedData['is_parent'] = $request->input('is_parent', 0);
+            $validatedData['ishomepage'] = $request->has('ishomepage') ? 1 : 0;
 
-        $category = Category::create($validatedData);
+            $category = Category::create($validatedData);
 
-        if ($request->has('attribute_values')) {
-            $valueIds = collect($request->attribute_values)->flatten()->all(); // [1,2,5,6]
-            $category->attributeValues()->sync($valueIds); // Many-to-many relation
+            if ($request->has('attribute_values')) {
+                $valueIds = collect($request->attribute_values)->flatten()->all(); // [1,2,5,6]
+                $category->attributeValues()->sync($valueIds); // Many-to-many relation
+            }
+
+            return redirect()
+                ->route('category.index')
+                ->with('success', 'Category successfully added');
+        } catch (\Throwable $e) {
+            // Log the error for debugging
+            echo $e->getMessage();
+            exit;
+            \Log::error('Category Store Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()
+                ->route('category.index')
+                ->with('error', 'An error occurred while adding the category. Please try again.');
         }
-
-        return redirect()
-            ->route('category.index')
-            ->with('success', 'Category successfully added');
-    } catch (\Throwable $e) {
-        // Log the error for debugging
-        echo $e->getMessage();exit;
-        \Log::error('Category Store Error: '.$e->getMessage(), [
-            'trace' => $e->getTraceAsString()
-        ]);
-
-        return redirect()
-            ->route('category.index')
-            ->with('error', 'An error occurred while adding the category. Please try again.');
     }
-}
 
 
     /**
@@ -102,13 +104,13 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
- 
+
         $parent_cats = Category::where('is_parent', 1)->get();
 
- $category = Category::with('attributeValues')->findOrFail($id);
-    $attributeTypes = Attribute::with('values')->where('name', 'Type')->get(); // eager load values
+        $category = Category::with('attributeValues')->findOrFail($id);
+        $attributeTypes = Attribute::with('values')->where('name', 'Type')->get(); // eager load values
 
-        return view('backend.category.edit', compact('category', 'parent_cats','attributeTypes'));
+        return view('backend.category.edit', compact('category', 'parent_cats', 'attributeTypes'));
     }
 
     /**
@@ -131,19 +133,19 @@ class CategoryController extends Controller
             'parent_id' => 'nullable|exists:categories,id',
             'engname' => 'required|string|max:255|unique:categories,engname,' . $category->id,
             'slug' => 'required|string|max:255|unique:categories,slug,' . $category->id,
-             'ishomepage' => 'nullable|boolean',
-             'position' => 'required|in:center,side',
-             'sort_order' => 'nullable|integer|min:0',
-              'menu_position' => 'nullable|in:main,extra,home',
+            'ishomepage' => 'nullable|boolean',
+            'position' => 'required|in:center,side',
+            'sort_order' => 'nullable|integer|min:0',
+            'menu_position' => 'nullable|in:main,extra,home',
         ]);
-// $slug = generateUniqueSlug($request->engname, Category::class);
-//         $validatedData['slug'] = $slug;
+        // $slug = generateUniqueSlug($request->engname, Category::class);
+        //         $validatedData['slug'] = $slug;
         $validatedData['is_parent'] = $request->input('is_parent', 0);
         $validatedData['ishomepage'] = $request->input('ishomepage', 0);
 
         $status = $category->update($validatedData);
         $selectedValues = collect($request->input('attribute_values'))->flatten()->filter()->all();
-    $category->attributeValues()->sync($selectedValues);
+        $category->attributeValues()->sync($selectedValues);
         $message = $status
             ? 'Category successfully updated'
             : 'Error occurred, Please try again!';
@@ -200,40 +202,41 @@ class CategoryController extends Controller
     }
 
 
-     public function frontendViewProductsForCategory($slug)
-{
-    // Find category with subcategories
-    $category = Category::with('children')->where('slug', $slug)->firstOrFail();
+    public function frontendViewProductsForCategory($slug)
+    {
+        // Find category with subcategories
+        $category = Category::with('children')->where('slug', $slug)->firstOrFail();
 
-    if ($category->children->isNotEmpty()) {
-        // Get products from all subcategories
-        $subCategoryIds = $category->children->pluck('id')->toArray();
+        if ($category->children->isNotEmpty()) {
+            // Get products from all subcategories
+            $subCategoryIds = $category->children->pluck('id')->toArray();
 
-        $product_lists = Product::with([
-            'variants.attributeValues.attribute', // variants with attributes
-            'specifications'                   // technical specifications                            // product images
-        ])->whereIn('child_cat_id', $subCategoryIds)->get();
+            $product_lists = Product::with([
+                'variants.attributeValues.attribute', // variants with attributes
+                'specifications'                   // technical specifications                        
+            ])->whereIn('child_cat_id', $subCategoryIds)
+            ->paginate(3);
+        } else {
+            // No subcategories → products directly under this category
+            $product_lists = Product::with([
+                'variants.attributeValues.attribute',
+                'specifications'
+            ])->where(function($q) use ($category) {
+                $q->where('cat_id', $category->id)
+                  ->orWhere('child_cat_id', $category->id);
+            })->paginate(3);
+        }
 
-    } else {
-        // No subcategories → products directly under this category
-        $product_lists = Product::with([
-            'variants.attributeValues.attribute',
-            'specifications'
-        ])->where('cat_id', $category->id)
-          ->orWhere('child_cat_id', $category->id)
-          ->get();
+        $parentCategories = Category::with('children')->whereNull('parent_id')->get();
+        return view('frontendtheme.category_products', compact('category', 'parentCategories', 'product_lists'));
     }
 
-    $parentCategories = Category::with('children')->whereNull('parent_id')->get();
-    return view('frontendtheme.category_products', compact('category', 'parentCategories', 'product_lists'));
-}
 
 
 
 
 
-
- public function productFilter(Request $request, $slug)
+    public function productFilter(Request $request, $slug)
     {
         // Get the current category by slug
         $category = Category::with('parent', 'children')->where('slug', $slug)->firstOrFail();
@@ -254,7 +257,7 @@ class CategoryController extends Controller
         // Price range
         if ($request->has('min_price') && $request->has('max_price')) {
             $productsQuery->whereBetween('price', [
-                $request->min_price, 
+                $request->min_price,
                 $request->max_price
             ]);
         }
@@ -262,9 +265,9 @@ class CategoryController extends Controller
         // Attributes (variants filter)
         if ($request->has('filter')) {
             foreach ($request->filter as $attrName => $values) {
-                $productsQuery->whereHas('attributes', function($q) use ($attrName, $values) {
+                $productsQuery->whereHas('attributes', function ($q) use ($attrName, $values) {
                     $q->where('name', $attrName)
-                      ->whereIn('value_id', $values);
+                        ->whereIn('value_id', $values);
                 });
             }
         }
@@ -308,28 +311,55 @@ class CategoryController extends Controller
 
 
 
-public function allProductsPage(Request $request)
-{
-    // --- 1. Get all categories with children (subcategories) ---
-    $parentCategories = Category::with('children')->whereNull('parent_id')->get();
+    // public function allProductsPage(Request $request)
+    // {
+    //     // --- 1. Get all categories with children (subcategories) ---
+    //     $parentCategories = Category::with('children')->whereNull('parent_id')->get();
 
-    // --- 2. Get all attributes with their values ---
+    //     // --- 2. Get all attributes with their values ---
+    //     $attributes = Attribute::with('values')->get();
+
+    //     // --- 3. Get all products with relationships, paginated ---
+    //     $products = Product::with([
+    //         'variants.attributeValues.attribute', // variant attribute values
+    //         'specifications',                     // product specifications
+    //         'cat_info',                           // parent category
+    //         'sub_cat_info'                         // child category
+    //     ])->paginate(12);
+
+    //     // --- 4. Return view ---
+    //     return view('frontendtheme.products', compact('parentCategories', 'attributes', 'products'));
+    // }
+
+    public function allProductsPage(Request $request)
+{
+    $parentCategories = Category::withCount('products')
+        ->with('children')
+        ->whereNull('parent_id')
+        ->get();
+
     $attributes = Attribute::with('values')->get();
 
-    // --- 3. Get all products with relationships, paginated ---
-    $products = Product::with([
-        'variants.attributeValues.attribute', // variant attribute values
-        'specifications',                     // product specifications
-        'cat_info',                           // parent category
-        'sub_cat_info'                         // child category
-    ])->paginate(12);
+    $query = Product::with(['variants.attributeValues.attribute', 'specifications', 'cat_info', 'sub_cat_info']);
 
-    // --- 4. Return view ---
+    // Filter by attributes
+    if ($request->filled('attributes')) {
+        $selectedValues = collect($request->input('attributes'))->flatten()->toArray();
+        $query->whereHas('variants.attributeValues', function ($q) use ($selectedValues) {
+            $q->whereIn('attribute_value_id', $selectedValues);
+        });
+    }
+
+    // Filter by category
+    if ($request->filled('category')) {
+        $query->whereHas('cat_info', function ($q) use ($request) {
+            $q->where('slug', $request->category);
+        });
+    }
+
+    $products = $query->paginate(6)->appends($request->query());
+
     return view('frontendtheme.products', compact('parentCategories', 'attributes', 'products'));
 }
-
-
-
-
 
 }

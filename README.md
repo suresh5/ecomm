@@ -36,8 +36,8 @@ A full-fledged **eCommerce solution** built on **Laravel 10**, featuring a moder
 
 ### 🔹 **Step 1: Clone the Repository**
 ```sh
-git clone https://github.com/Prajwal100/Complete-Ecommerce-in-laravel-10.git
-cd Complete-Ecommerce-in-laravel-10
+git clone https://github.com/suresh5/ecomm.git
+cd ecomm
 ```
 
 ### 🔹 **Step 2: Install Dependencies**
@@ -83,8 +83,8 @@ php artisan serve
 ## 📩 Contact Me
 💼 Need a **Full Stack Laravel Developer**? Let's work together!
 
-📧 **Email:** rosesuresh10mca@gmail.com 
-📲 **WhatsApp:** +91 6382066987
+📧 **Email:** sharsh.hd@gmail.com 
+📲 **WhatsApp:** +91 8359858313
  
 
 ## 📜 License
